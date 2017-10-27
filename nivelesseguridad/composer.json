@@ -1,0 +1,11 @@
+{
+    "name": "vendor/niveles-seguridad",
+    "description": "Description of project NivelesSeguridad.",
+    "authors": [
+        {
+            "name": "DAW",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {}
+}
