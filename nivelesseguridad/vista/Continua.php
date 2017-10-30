@@ -11,6 +11,4 @@
  *
  * @author DAW
  */
-class Continua {
-    //put your code here
-}
+echo "CONTINUA";

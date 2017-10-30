@@ -11,6 +11,4 @@
  *
  * @author DAW
  */
-class Acierto {
-    //put your code here
-}
+echo "ACIERTO";
