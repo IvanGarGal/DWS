@@ -4,9 +4,9 @@ require_once '.src\controller\Nivel1.php';
 require_once '.src\controller\Nivel2.php';
 require_once '.src\controller\Nivel3.php';
 
-use controller\Nivel1;
-use controller\Nivel2;
-use controller\Nivel3;
+//use controller\Nivel1;
+//use controller\Nivel2;
+//use controller\Nivel3;
 
 
 $param=$_REQUEST["nivel"];

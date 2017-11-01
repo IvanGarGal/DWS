@@ -9,7 +9,7 @@ class Nivel1 {
             $_SESSION["nivel"] = "1";
         }      
         else {
-            if($_SESSION["nivel"] = "1"){
+            if($_SESSION["nivel"] == "1"){
                 if (isset($param)){
                     $_SESSION["nivel"] = "1";
                 }

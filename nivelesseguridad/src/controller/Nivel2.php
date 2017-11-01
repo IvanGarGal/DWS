@@ -9,7 +9,7 @@ class Nivel2 {
             $_SESSION["nivel"] = "1";
         }      
         else {
-            if($_SESSION["nivel"] = "21"){
+            if($_SESSION["nivel"] == "21"){
                 if (isset($param)){
                     $_SESSION["nivel"] = "1";
                 }
@@ -24,7 +24,7 @@ class Nivel2 {
                 }
             } 
             
-            if($_SESSION["nivel"] = "22"){
+            if($_SESSION["nivel"] == "22"){
                 if (isset($param)){
                     $_SESSION["nivel"] = "1";
                 }
@@ -39,7 +39,7 @@ class Nivel2 {
                 }
             }
             
-            if($_SESSION["nivel"] = "23"){
+            if($_SESSION["nivel"] == "23"){
                 if (isset($param)){
                     $_SESSION["nivel"] = "1";
                 }
