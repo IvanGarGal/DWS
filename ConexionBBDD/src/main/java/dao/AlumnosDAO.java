@@ -14,7 +14,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.Context;
@@ -26,10 +28,10 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
-
-import org.springframework.jdbc.core.JdbcTemplate;  
-
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 /**
  *
@@ -37,6 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class AlumnosDAO {
 
+    //Select DBUtils
     public List<Alumno> getAllAlumnos() {
         List<Alumno> lista = null;
         DBConnection db = new DBConnection();
@@ -56,6 +59,7 @@ public class AlumnosDAO {
         return lista;
     }
 
+    // Select JDBC
     public List<Alumno> getAllAlumnosJDBC() {
         List<Alumno> lista = new ArrayList<>();
         Alumno nuevo = null;
@@ -105,15 +109,14 @@ public class AlumnosDAO {
 
     }
 
+    // Con datasource
     public Alumno getUserById(int id) {
         Alumno user = null;
         DBConnection db = new DBConnection();
 
         Connection con = null;
         try {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("jdbc/db4free");
-            con = ds.getConnection();
+            con = db.getDataSourceFromServer().getConnection();
             QueryRunner qr = new QueryRunner();
             ResultSetHandler<Alumno> h
                     = new BeanHandler<>(Alumno.class);
@@ -126,6 +129,7 @@ public class AlumnosDAO {
         return user;
     }
 
+    //inser JDBC
     public Alumno insertAlumnoJDBC(Alumno a) {
         DBConnection db = new DBConnection();
         Connection con = null;
@@ -136,10 +140,7 @@ public class AlumnosDAO {
             stmt.setString(1, a.getNombre());
             stmt.setDate(2, new java.sql.Date(a.getFecha_nacimiento().getTime()));
             stmt.setBoolean(3, a.getMayor_edad());
-            
-            
             int filas = stmt.executeUpdate();
-            
 
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
@@ -155,6 +156,14 @@ public class AlumnosDAO {
         return a;
     }
 
+    public List<Alumno> getAllAlumnosJDBCTemplate()
+    {
+        DBConnection db = new DBConnection();
+        JdbcTemplate jtm = new JdbcTemplate(db.getDataSource());
+        List<Alumno> alumnos = jtm.query("Select * from ALUMNOS",new BeanPropertyRowMapper(Alumno.class));
+        return alumnos;
+    }
+    
     public Alumno getUser(Alumno userOriginal) {
         Alumno user = null;
         DBConnection db = new DBConnection();
@@ -173,66 +182,38 @@ public class AlumnosDAO {
         return user;
     }
 
-    public void delUser(Alumno u) {
+    //insert spring jdbc template
+    public Alumno addUserSimpleJDBCTemplate(Alumno a) {
         DBConnection db = new DBConnection();
-        Connection con = null;
-        try {
-            con = db.getConnection();
-            QueryRunner qr = new QueryRunner();
 
-            int filas = qr.update(con,
-                    "DELETE FROM LOGIN WHERE ID=?",
-                    u.getId());
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(db.getDataSource()).withTableName("ALUMNOS").usingGeneratedKeyColumns("ID");
+        Map<String, Object> parameters = new HashMap<String, Object>();
 
-        } catch (Exception ex) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            db.cerrarConexion(con);
-        }
+        parameters.put("NOMBRE", a.getNombre());
+        parameters.put("FECHA_NACIMIENTO", a.getFecha_nacimiento());
+        parameters.put("MAYOR_EDAD", a.getMayor_edad());
+        a.setId(jdbcInsert.executeAndReturnKey(parameters).longValue());
+        return a;
+    }
+    
+     //insert spring jdbc template
+    public Alumno addUserJDBCTemplate(Alumno a) {
+        DBConnection db = new DBConnection();
+        JdbcTemplate jtm = new JdbcTemplate(db.getDataSource());
+        
+        
+
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(db.getDataSource()).withTableName("ALUMNOS").usingGeneratedKeyColumns("ID");
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        parameters.put("NOMBRE", a.getNombre());
+        parameters.put("FECHA_NACIMIENTO", a.getFecha_nacimiento());
+        parameters.put("MAYOR_EDAD", a.getMayor_edad());
+        a.setId(jdbcInsert.executeAndReturnKey(parameters).longValue());
+        return a;
     }
 
-    public void updateUser(Alumno u) {
-        DBConnection db = new DBConnection();
-        Connection con = null;
-        try {
-            con = db.getConnection();
-            QueryRunner qr = new QueryRunner();
-
-            int filas = qr.update(con,
-                    "UPDATE LOGIN SET MAIL=? WHERE USER=?",
-                    "", "");
-
-        } catch (Exception ex) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            db.cerrarConexion(con);
-        }
-    }
-
-
-    public int cambiarPassUser(String codigo, String password) {
-        DBConnection db = new DBConnection();
-        Connection con = null;
-        int filas = 0;
-        try {
-            con = db.getConnection();
-            QueryRunner qr = new QueryRunner();
-
-            filas = qr.update(con,
-                    "UPDATE LOGIN SET PASSWORD=? WHERE ACTIVACION=? "
-                    + "AND fecha_renovacion > date_sub(now(),INTERVAL 1 HOUR)",
-                    password, codigo);
-
-        } catch (Exception ex) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            db.cerrarConexion(con);
-        }
-        return filas;
-
-    }
-
-  
+    // insert DBUTILS
     public Alumno addUser(Alumno u, String activacion) {
         DBConnection db = new DBConnection();
         Connection con = null;
