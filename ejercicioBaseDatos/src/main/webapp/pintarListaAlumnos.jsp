@@ -1,9 +1,3 @@
-<%-- 
-    Document   : pintarListaAlumnos
-    Created on : Oct 28, 2017, 8:02:42 PM
-    Author     : Miguel Angel Diaz
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" 
            uri="http://java.sun.com/jsp/jstl/core" %>

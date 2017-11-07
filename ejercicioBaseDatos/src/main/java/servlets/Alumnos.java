@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package servlets;
 
 import java.io.IOException;
@@ -20,10 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import servicios.AlumnosServicios;
 import model.Alumno;
 
-/**
- *
- * @author oscar
- */
 @WebServlet(name = "Alumnos", urlPatterns = {"/alumnos"})
 public class Alumnos extends HttpServlet {
 
@@ -69,6 +60,11 @@ public class Alumnos extends HttpServlet {
             }
         }
         // getAll siempre se hace
+        
+        // LE MANDO LA INFORMACIÓN AL " <c:forEach items="${alumnos}" var="alumno"> " DE pintarAlumnos.jsp
+        // "alumnos" está enlazado con "${alumnos}"
+        // "alumnos" contiene dentro la función "as.getAllAlumnos()" que lo que hace es mostrar los alumnos que hay dentro de la tabla
+        // a "${alumnos}" le cambio el nombre "alumno" mediante var="alumno"
         request.setAttribute("alumnos", as.getAllAlumnos());
         request.getRequestDispatcher("pintarListaAlumnos.jsp").forward(request, response);
 
