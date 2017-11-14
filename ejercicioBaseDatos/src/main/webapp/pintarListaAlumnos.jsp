@@ -52,8 +52,8 @@
 
                     <td>
                         <input type="checkbox" <c:if test="${alumno.mayor_edad}" >checked</c:if> />
-                        </td>
-                    </tr>
+                    </td>
+               </tr>
 
 
             </c:forEach> 

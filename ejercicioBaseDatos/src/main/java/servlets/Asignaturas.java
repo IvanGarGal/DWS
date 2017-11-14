@@ -52,11 +52,12 @@ public class Asignaturas extends HttpServlet {
                     break;
                 case "borrar":
                     a.setId(Long.parseLong(request.getParameter("idasignatura")));
+                    as.delAsignatura(a);
                     break;
             }
         }
         request.setAttribute("asignaturas", as.getAllAsignaturas());
-        request.getRequestDispatcher("pintarListaAsignatures.jsp").forward(request, response);
+        request.getRequestDispatcher("pintarListaAsignaturas.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
