@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-import model.Asignatura;
-import model.Asignatura;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -29,10 +27,6 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
-/**
- *
- * @author oscar
- */
 public class AsignaturasDAO {
 
     public List<Asignatura> getAllAsignaturas() {
