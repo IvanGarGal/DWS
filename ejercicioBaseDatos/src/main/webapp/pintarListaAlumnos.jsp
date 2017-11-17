@@ -16,7 +16,7 @@
         <title>JSP Page</title>
         <script>
 
-            function cargarAlumno(id, nombre, fecha, mayor) {
+            function cargarAlumnos(id, nombre, fecha, mayor) {
                 document.getElementById("idalumno").value = id;
                 document.getElementById("nombre").value = nombre;
                 document.getElementById("fecha").value = fecha;
@@ -46,7 +46,7 @@
                 <tr>
                     <td>
                         <input type="button" value="Cargar ${alumno.id}" style="width:100px"
-                               onclick="cargarAlumno('${alumno.id}', '${fn:escapeXml(fn:replace(alumno.nombre,"'", "\\'"))}'
+                               onclick="cargarAlumnos('${alumno.id}', '${fn:escapeXml(fn:replace(alumno.nombre,"'", "\\'"))}'
                                                , '<fmt:formatDate value="${alumno.fecha_nacimiento}" pattern="dd-MM-yyyy"/>'
                                                , ${alumno.mayor_edad});"/>
                     </td> 
