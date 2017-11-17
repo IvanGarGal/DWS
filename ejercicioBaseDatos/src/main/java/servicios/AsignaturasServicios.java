@@ -6,38 +6,37 @@
 package servicios;
 
 import dao.AsignaturasDAO;
-import java.util.List;
 import model.Asignatura;
+import java.util.List;
+
 /**
  *
- * @author daw
+ * @author Miguel Angel Diaz
  */
 public class AsignaturasServicios {
-    public List<Asignatura> getAllAsignaturas(){
+
+    public List<Asignatura> getAllAsignaturas() {
         AsignaturasDAO dao = new AsignaturasDAO();
-        
         return dao.getAllAsignaturas();
     }
-    
-    public Asignatura getAsignaturaById(int id) {
+
+    public Asignatura addAsignatura(Asignatura a) {
         AsignaturasDAO dao = new AsignaturasDAO();
-        
-        return dao.getUserById(id);
+        return dao.addAsignatura(a);
+    }
+
+    public int updateAsignatura(Asignatura a) {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.updateAsignatura(a);
+    }
+
+    public int delAsignatura(Asignatura a) {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.delAsignatura(a);
     }
     
-    public Asignatura addAsignatura(Asignatura asignaturaNuevo) {
+    public int delAsignatura2(Asignatura a){
         AsignaturasDAO dao = new AsignaturasDAO();
-        
-        return dao.insertAsignatura(asignaturaNuevo);
-    }
-    
-    public void updateAsignatura(Asignatura asignaturaNuevo) {
-        AsignaturasDAO dao = new AsignaturasDAO();
-        dao.updateUser (asignaturaNuevo);
-    }
-    
-    public void delAsignatura(Asignatura asignaturaNuevo){
-        AsignaturasDAO dao = new AsignaturasDAO();
-        dao.delUser(asignaturaNuevo);
+        return dao.delAsignatura2(a);
     }
 }

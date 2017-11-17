@@ -1,24 +1,25 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import servicios.AlumnosServicios;
-import servicios.NotasServicios;
-import servicios.AsignaturasServicios;
-import model.Alumno;
-import model.Asignatura;
 import model.Nota;
+import servicios.AlumnosServicios;
+import servicios.AsignaturasServicios;
+import servicios.NotasServicios;
 
+/**
+ *
+ * @author Miguel Angel Diaz
+ */
 @WebServlet(name = "Notas", urlPatterns = {"/notas"})
 public class Notas extends HttpServlet {
 
@@ -33,45 +34,59 @@ public class Notas extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        NotasServicios as = new NotasServicios();
+        NotasServicios ns = new NotasServicios();
+        AlumnosServicios alums = new AlumnosServicios();
+        AsignaturasServicios asigs = new AsignaturasServicios();
         String op = request.getParameter("accion");
+        String idAlu = request.getParameter("idAlumno");
+        String idAsig = request.getParameter("idAsignatura");
+        String nomAlu = request.getParameter("nombreAlumno");
+        String nomAsig = request.getParameter("nombreAsignatura");
+        String nota = request.getParameter("nota");
+        boolean cargar = false;
 
         if (op != null) {
-            String nombre = request.getParameter("nombre");
-            String fecha = request.getParameter("fecha");
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate fechaNacimiento = LocalDate.parse(fecha, dtf);
-            boolean mayor;
-            mayor = request.getParameter("mayor") != null;
-            Alumno a = new Alumno();
-            a.setNombre(nombre);
-            a.setFecha_nacimiento(Date.from(fechaNacimiento.atStartOfDay().toInstant(ZoneOffset.UTC)));
-            a.setMayor_edad(mayor);
+            Nota n = new Nota();
+            n.setIdAlumno(Long.parseLong(idAlu));
+            n.setIdAsignatura(Long.parseLong(idAsig));
+            int filas = 0;
 
             switch (op) {
-                case "actualizar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.updateAlumno(a);
-                    break;
-                case "insertar":
-                    a = as.addAlumno(a);
+                case "guardar":
+                    n.setNota(Integer.parseInt(nota));
+                    n = ns.guardarNota(n);
+                    if (n != null) {
+                        filas = 1;
+                    }
+                    request.setAttribute("nota", n);
                     break;
                 case "borrar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.delAlumno(a);
+                    filas = ns.delNota(n);
                     break;
+                case "cargar":
+                    n = ns.getNota(n.getIdAlumno(), n.getIdAsignatura());
+                    cargar = true;
+                    if (n == null) {
+                        request.setAttribute("mensaje", "No hay notas");
+                    }else{
+                        request.setAttribute("nota", n);
+                    }
+                    break;
+            }
+            if (filas != 0 && cargar == false) {
+                request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+            } else if (filas == 0 && cargar == false) {
+                request.setAttribute("mensaje", "No se han hecho modificaciones");
             }
         }
         // getAll siempre se hace
-        
-        // LE MANDO LA INFORMACIÓN AL " <c:forEach items="${alumnos}" var="alumno"> " DE pintarAlumnos.jsp
-        // "alumnos" está enlazado con "${alumnos}"
-        // "alumnos" contiene dentro la función "as.getAllAlumnos()" que lo que hace es mostrar los alumnos que hay dentro de la tabla
-        // a "${alumnos}" le cambio el nombre "alumno" mediante var="alumno"
-        request.setAttribute("alumnos", as.getAllAlumnos());
+        request.setAttribute("asignaturas", asigs.getAllAsignaturas());
+        request.setAttribute("alumnos", alums.getAllAlumnos());
+        request.setAttribute("nomAlu", nomAlu);
+        request.setAttribute("idAlu", idAlu);
+        request.setAttribute("nomAsig", nomAsig);
+        request.setAttribute("idAsig", idAsig);
         request.getRequestDispatcher("pintarListaNotas.jsp").forward(request, response);
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

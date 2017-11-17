@@ -1,20 +1,23 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import servicios.AsignaturasServicios;
 import model.Asignatura;
+import servicios.AsignaturasServicios;
 
+/**
+ *
+ * @author Miguel Angel Diaz
+ */
 @WebServlet(name = "Asignaturas", urlPatterns = {"/asignaturas"})
 public class Asignaturas extends HttpServlet {
 
@@ -29,33 +32,52 @@ public class Asignaturas extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         AsignaturasServicios as = new AsignaturasServicios();
         String op = request.getParameter("accion");
-        
+
         if (op != null) {
-            String nombre = request.getParameter("nombre");
-            String curso = request.getParameter("curso");
-            String ciclo = request.getParameter("ciclo");
             Asignatura a = new Asignatura();
-            a.setNombre(nombre);
-            a.setCurso(curso);
-            a.setCiclo(ciclo);
-            
+            a.setNombre(request.getParameter("nombre"));
+            a.setCiclo(request.getParameter("ciclo"));
+            a.setCurso(request.getParameter("curso"));
+            int filas = 0;
+            boolean errorBorrar = false;
+
             switch (op) {
                 case "actualizar":
                     a.setId(Long.parseLong(request.getParameter("idasignatura")));
-                    as.updateAsignatura(a);
+                    filas = as.updateAsignatura(a);
                     break;
                 case "insertar":
                     a = as.addAsignatura(a);
+                    if (a != null) {
+                        filas = 1;
+                    }
                     break;
                 case "borrar":
                     a.setId(Long.parseLong(request.getParameter("idasignatura")));
-                    as.delAsignatura(a);
+                    filas = as.delAsignatura(a);
+                    if (filas == -1) {
+                        request.setAttribute("errorBorrar", "Si borras esta asignatura se borrarán todas las notas asociadas a ella.");
+                        request.setAttribute("asignatura", a);
+                        errorBorrar = true;
+                    }
+                    break;
+                case "borrar2":
+                    a.setId(Long.parseLong(request.getParameter("idasignatura")));
+                    filas = as.delAsignatura2(a);
                     break;
             }
+            if (errorBorrar == false) {
+                if (filas != 0) {
+                    request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+                } else {
+                    request.setAttribute("mensaje", "No se han hecho modificaciones");
+                }
+            }
         }
+        // getAll siempre se hace
         request.setAttribute("asignaturas", as.getAllAsignaturas());
         request.getRequestDispatcher("pintarListaAsignaturas.jsp").forward(request, response);
     }

@@ -1,8 +1,14 @@
+<%-- 
+    Document   : pintarListaAlumnos
+    Created on : Oct 28, 2017, 8:02:42 PM
+    Author     : Miguel Angel Diaz
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" 
            uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="utils.Constantes" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -33,34 +39,26 @@
     </head>
     <body>
         <h1>ALUMNOS</h1>
-        <table border="1">
+        <h3><c:out value="${mensaje}"></c:out></h3>
+
+            <table border="1">
             <c:forEach items="${alumnos}" var="alumno">  
                 <tr>
                     <td>
-                        <input type="button" value="Cargar ${alumno.id}" 
-                               onclick="cargarAlumno('${alumno.id}', '${alumno.nombre}'
-                                   , '<fmt:formatDate value="${alumno.fecha_nacimiento}" pattern="dd-MM-yyyy"/>'
-                                   , ${alumno.mayor_edad});"/>
+                        <input type="button" value="Cargar ${alumno.id}" style="width:100px"
+                               onclick="cargarAlumno('${alumno.id}', '${fn:escapeXml(fn:replace(alumno.nombre,"'", "\\'"))}'
+                                               , '<fmt:formatDate value="${alumno.fecha_nacimiento}" pattern="dd-MM-yyyy"/>'
+                                               , ${alumno.mayor_edad});"/>
                     </td> 
-                    <td>
-                        ${alumno.nombre}
-                    </td>
-
-                    <td>
-                        <fmt:formatDate value="${alumno.fecha_nacimiento}" pattern="dd-MM-yyyy"/>
-                    </td>
-
-                    <td>
-                        <input type="checkbox" <c:if test="${alumno.mayor_edad}" >checked</c:if> />
-                    </td>
-               </tr>
-
-
-            </c:forEach> 
-
+                    <td>${alumno.nombre}</td>
+                    <td><fmt:formatDate value="${alumno.fecha_nacimiento}" pattern="dd-MM-yyyy"/></td>
+                    <td><input type="checkbox" <c:if test="${alumno.mayor_edad}" >checked</c:if> /></td>
+                    </tr>
+            </c:forEach>                   
         </table>
+
         <br>
-        <form id="formulario" action = "alumnos" method="GET">
+        <form id="formulario" name="formulario" action = "alumnos" method="GET">
             <input type="hidden" id="idalumno" name="idalumno" />
             <input type="text" id="nombre" name="nombre" size="12"/>
             <input type="text" id="fecha" name="fecha" size="12"/>
@@ -68,10 +66,23 @@
             <input type="hidden" id="accion" name="accion" value="">
             <br>
             <br>
-            <button id="actualizar" onclick="actualizarAccion();" value="actualizar" disabled>Actualizar</button>
+            <button id="actualizar" onclick="actualizarAccion()" disabled>Actualizar</button>
             <button id="insertar" onclick="insertarAccion()">Insertar</button>
             <button id="borrar" onclick="borrarAccion()" disabled>Borrar</button>
         </form>
+        <c:if test="${errorBorrar != null}">
+            <script>
+                var borrarnotas = confirm("${errorBorrar}" + "\n¿Quieres continuar?");
+                if (borrarnotas == true) {
+                    document.getElementById("accion").value = "borrar2";
+                    document.getElementById("idalumno").value = "${alumno.id}";
+                    document.getElementById("nombre").value = "${alumno.nombre}";
+                    document.getElementById("fecha").value = "${fecha}";
+                    document.getElementById("mayor").value = "${alumno.mayor_edad}";
+                    document.formulario.submit();
+                }
+            </script>
+        </c:if>
 
     </body>
 </html>

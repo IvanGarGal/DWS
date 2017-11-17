@@ -1,9 +1,12 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -15,6 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 import servicios.AlumnosServicios;
 import model.Alumno;
 
+/**
+ *
+ * @author Miguel Angel Diaz
+ */
 @WebServlet(name = "Alumnos", urlPatterns = {"/alumnos"})
 public class Alumnos extends HttpServlet {
 
@@ -44,27 +51,43 @@ public class Alumnos extends HttpServlet {
             a.setNombre(nombre);
             a.setFecha_nacimiento(Date.from(fechaNacimiento.atStartOfDay().toInstant(ZoneOffset.UTC)));
             a.setMayor_edad(mayor);
+            int filas = 0;
+            boolean errorBorrar = false;
 
             switch (op) {
                 case "actualizar":
                     a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.updateAlumno(a);
+                    filas = as.updateAlumno(a);
                     break;
                 case "insertar":
                     a = as.addAlumno(a);
+                    if (a != null) {
+                        filas = 1;
+                    }
                     break;
                 case "borrar":
                     a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.delAlumno(a);
+                    filas = as.delAlumno(a);
+                    if (filas == -1) {
+                        request.setAttribute("errorBorrar", "Si borras este alumno se borrarán todas sus notas.");
+                        request.setAttribute("alumno", a);
+                        request.setAttribute("fecha", fecha);
+                        errorBorrar = true;
+                    }
                     break;
+                case "borrar2":
+                    a.setId(Long.parseLong(request.getParameter("idalumno")));
+                    filas = as.delAlumno2(a);
+            }
+            if (errorBorrar == false) {
+                if (filas != 0) {
+                    request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+                } else {
+                    request.setAttribute("mensaje", "No se han hecho modificaciones");
+                }
             }
         }
         // getAll siempre se hace
-        
-        // LE MANDO LA INFORMACIÓN AL " <c:forEach items="${alumnos}" var="alumno"> " DE pintarAlumnos.jsp
-        // "alumnos" está enlazado con "${alumnos}"
-        // "alumnos" contiene dentro la función "as.getAllAlumnos()" que lo que hace es mostrar los alumnos que hay dentro de la tabla
-        // a "${alumnos}" le cambio el nombre "alumno" mediante var="alumno"
         request.setAttribute("alumnos", as.getAllAlumnos());
         request.getRequestDispatcher("pintarListaAlumnos.jsp").forward(request, response);
 
