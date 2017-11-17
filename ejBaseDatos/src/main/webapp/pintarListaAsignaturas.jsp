@@ -7,29 +7,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-        <script>
-
-            function cargarAlumno(id, nombre, curso, ciclo) {
-                document.getElementById("idasignatura").value = id;
-                document.getElementById("nombre").value = nombre;
-                document.getElementById("curso").value = curso;
-                document.getElementById("ciclo").checked = ciclo;
-                document.getElementById("actualizar").disabled = false;
-                document.getElementById("borrar").disabled = false;
-                document.getElementById("insertar").disabled = true;
-            }
-
-            function actualizarAccion() {
-                document.getElementById("accion").value = "actualizar";
-            }
-            function insertarAccion() {
-                document.getElementById("accion").value = "insertar";
-            }
-            function borrarAccion() {
-                document.getElementById("accion").value = "borrar";
-            }
-        </script>
+        <title> Asignaturas </title>
+        <script src="funciones.js"></script>
     </head>
     <body>
         <h1>ALUMNOS</h1>
