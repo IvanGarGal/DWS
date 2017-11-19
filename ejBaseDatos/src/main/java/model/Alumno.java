@@ -8,6 +8,11 @@ public class Alumno {
     private String nombre;
     private Date fecha_nacimiento;
     private Boolean mayor_edad;
+    
+  
+    public Alumno() {
+        
+    }
 
     public long getId() {
         return id;
@@ -40,11 +45,5 @@ public class Alumno {
     public void setMayor_edad(Boolean mayor_edad) {
         this.mayor_edad = mayor_edad;
     }
-
-  
-    public Alumno() {
-    }
-
-   
     
 }

@@ -19,25 +19,24 @@ public class AsignaturasServicios {
         return dao.getAllAsignaturas();
     }
     
-    public Asignatura getAsignaturaById(int id) {
-        AsignaturasDAO dao = new AsignaturasDAO();
-        
-        return dao.getUserById(id);
-    }
-    
     public Asignatura addAsignatura(Asignatura asignaturaNuevo) {
         AsignaturasDAO dao = new AsignaturasDAO();
         
         return dao.insertAsignatura(asignaturaNuevo);
     }
     
-    public void updateAsignatura(Asignatura asignaturaNuevo) {
+    public int updateAsignatura(Asignatura asignaturaNuevo) {
         AsignaturasDAO dao = new AsignaturasDAO();
-        dao.updateUser (asignaturaNuevo);
+        return dao.updateAsignatura(asignaturaNuevo);
     }
     
-    public void delAsignatura(Asignatura asignaturaNuevo){
+    public int delAsignatura(Asignatura asignaturaNuevo){
         AsignaturasDAO dao = new AsignaturasDAO();
-        dao.delUser(asignaturaNuevo);
+        return dao.delAsignatura(asignaturaNuevo);
+    }
+    
+    public int delAsignatura2(Asignatura asignaturaNuevo){
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.delAsignatura2(asignaturaNuevo);
     }
 }

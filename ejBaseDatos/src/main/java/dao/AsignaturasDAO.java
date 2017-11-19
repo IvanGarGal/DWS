@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import model.Asignatura;
@@ -36,8 +31,7 @@ public class AsignaturasDAO {
         try {
             con = db.getConnection();
             QueryRunner qr = new QueryRunner();
-            ResultSetHandler<List<Asignatura>> h
-                    = new BeanListHandler<Asignatura>(Asignatura.class);
+            ResultSetHandler<List<Asignatura>> h = new BeanListHandler<Asignatura>(Asignatura.class);
             lista = qr.query(con, "select * FROM ASIGNATURAS", h);
 
         } catch (Exception ex) {
@@ -48,92 +42,91 @@ public class AsignaturasDAO {
         return lista;
     }
     
-    public Asignatura getUserById(int id) {
-        Asignatura user = null;
-        DBConnection db = new DBConnection();
-
-        Connection con = null;
-        try {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("jdbc/db4free");
-            con = ds.getConnection();
-            QueryRunner qr = new QueryRunner();
-            ResultSetHandler<Asignatura> h
-                    = new BeanHandler<>(Asignatura.class);
-            user = qr.query(con, "select * FROM ASIGNATURAS where ID = ?", h, id);
-        } catch (Exception ex) {
-            Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            db.cerrarConexion(con);
-        }
-        return user;
-    }
-    
     public Asignatura insertAsignatura(Asignatura asignatura) {
         DBConnection db = new DBConnection();
         Connection con = null;
         try {
             con = db.getConnection();
+            con.setAutoCommit(false);
             QueryRunner qr = new QueryRunner();
-
-            BigInteger id = qr.insert(con,
-              "INSERT INTO ASIGNATURAS (NOMBRE,CICLO,CURSO) VALUES(?,?,?)",
-              new ScalarHandler<BigInteger>(),asignatura.getNombre(), asignatura.getCiclo(), asignatura.getCurso());
-
-            asignatura.setId(id.longValue());
+            long id = qr.insert(con,
+                    "INSERT INTO ASIGNATURAS (NOMBRE,CICLO,CURSO) VALUES(?,?,?)",
+                    new ScalarHandler<Long>(), asignatura.getNombre(), asignatura.getCiclo(), asignatura.getCurso());
+           
+            asignatura.setId(id);
+            con.commit();
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            asignatura = null;
         } finally {
             db.cerrarConexion(con);
         }
         return asignatura;
     }
     
-    public Asignatura updateUser(Asignatura asignatura) {
+    public int updateAsignatura(Asignatura asignatura) {
         DBConnection db = new DBConnection();
         Connection con = null;
-
+        int filas = 0;
         try {
             con = db.getConnection();
-
             QueryRunner qr = new QueryRunner();
-
-           int filas = qr.update(con,
-              "UPDATE ASIGNATURAS SET NOMBRE = ?, CURSO = ?, CICLO = ? WHERE ID = ?",
-              asignatura.getNombre(),asignatura.getCurso(),asignatura.getCiclo(),asignatura.getId());
+            filas = qr.update(con, "UPDATE ASIGNATURAS SET NOMBRE = ?, CICLO = ?, CURSO = ? WHERE ID = ?", asignatura.getNombre(), asignatura.getCiclo(), asignatura.getCurso(), asignatura.getId());
 
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             db.cerrarConexion(con);
         }
-        return asignatura;
-
+        return filas;
     }
     
-    public Asignatura delUser(Asignatura asignatura) {
+    public int delAsignatura(Asignatura asignatura) {
         DBConnection db = new DBConnection();
         Connection con = null;
-
+        int filas = 0;
         try {
             con = db.getConnection();
-
             QueryRunner qr = new QueryRunner();
-
-           int filas = qr.update(con,
-              "DELETE FROM ASIGNATURAS WHERE ID = ?",
-              asignatura.getId());
+            filas = qr.update(con, "DELETE FROM ASIGNATURAS WHERE ID = ?", asignatura.getId());
 
         } catch (Exception ex) {
+            if (ex.getMessage().contains("foreign")){
+                filas = -1;
+            }
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             db.cerrarConexion(con);
         }
-        return asignatura;
-
+        return filas;
     }
     
-    
+    public int delAsignatura2(Asignatura asignatura) {
+        DBConnection db = new DBConnection();
+        Connection con = null;
+        int filas = 0;
+        try {
+            con = db.getConnection();
+            con.setAutoCommit(false);
+            QueryRunner qr = new QueryRunner();
+            filas += qr.update(con, "DELETE FROM NOTAS WHERE ID_ASIGNATURA = ?", asignatura.getId());
+            filas += qr.update(con, "DELETE FROM ASIGNATURAS WHERE ID = ?", asignatura.getId());
+            
+            con.commit();
+
+        } catch (Exception ex) {
+            Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (con!=null)
+                    con.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } finally {
+            db.cerrarConexion(con);
+        }
+        return filas;
+    }
     /**
     public List<Asignatura> getAllAsignaturasJDBC() {
         List<Asignatura> lista = new ArrayList<>();

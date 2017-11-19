@@ -34,33 +34,49 @@ public class Notas extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        NotasServicios as = new NotasServicios();
+        NotasServicios ns = new NotasServicios();
+        AlumnosServicios alums = new AlumnosServicios();
+        AsignaturasServicios asigs = new AsignaturasServicios();
         String op = request.getParameter("accion");
+        String idAlu = request.getParameter("idAlumno");
+        String idAsig = request.getParameter("idAsignatura");
+        String nomAlu = request.getParameter("nombreAlumno");
+        String nomAsig = request.getParameter("nombreAsignatura");
+        String nota = request.getParameter("nota");
+        boolean cargar = false;
 
         if (op != null) {
-            String nombre = request.getParameter("nombre");
-            String fecha = request.getParameter("fecha");
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate fechaNacimiento = LocalDate.parse(fecha, dtf);
-            boolean mayor;
-            mayor = request.getParameter("mayor") != null;
-            Alumno a = new Alumno();
-            a.setNombre(nombre);
-            a.setFecha_nacimiento(Date.from(fechaNacimiento.atStartOfDay().toInstant(ZoneOffset.UTC)));
-            a.setMayor_edad(mayor);
+            Nota n = new Nota();
+            n.setIdAlumno(Long.parseLong(idAlu));
+            n.setIdAsignatura(Long.parseLong(idAsig));
+            int filas = 0;
 
             switch (op) {
-                case "actualizar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.updateAlumno(a);
-                    break;
-                case "insertar":
-                    a = as.addAlumno(a);
+                case "guardar":
+                    n.setNota(Integer.parseInt(nota));
+                    n = ns.guardarNota(n);
+                    if (n != null) {
+                        filas = 1;
+                    }
+                    request.setAttribute("nota", n);
                     break;
                 case "borrar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    as.delAlumno(a);
+                    filas = ns.delNota(n);
                     break;
+                case "cargar":
+                    n = ns.getNota(n.getIdAlumno(), n.getIdAsignatura());
+                    cargar = true;
+                    if (n == null) {
+                        request.setAttribute("mensaje", "No hay notas");
+                    }else{
+                        request.setAttribute("nota", n);
+                    }
+                    break;
+            }
+            if (filas != 0 && cargar == false) {
+                request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+            } else if (filas == 0 && cargar == false) {
+                request.setAttribute("mensaje", "No se han hecho modificaciones");
             }
         }
         // getAll siempre se hace
@@ -69,7 +85,12 @@ public class Notas extends HttpServlet {
         // "alumnos" está enlazado con "${alumnos}"
         // "alumnos" contiene dentro la función "as.getAllAlumnos()" que lo que hace es mostrar los alumnos que hay dentro de la tabla
         // a "${alumnos}" le cambio el nombre "alumno" mediante var="alumno"
-        request.setAttribute("alumnos", as.getAllAlumnos());
+        request.setAttribute("asignaturas", asigs.getAllAsignaturas());
+        request.setAttribute("alumnos", alums.getAllAlumnos());
+        request.setAttribute("nomAlu", nomAlu);
+        request.setAttribute("idAlu", idAlu);
+        request.setAttribute("nomAsig", nomAsig);
+        request.setAttribute("idAsig", idAsig);
         request.getRequestDispatcher("pintarListaNotas.jsp").forward(request, response);
 
     }

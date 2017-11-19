@@ -34,26 +34,44 @@ public class Asignaturas extends HttpServlet {
         String op = request.getParameter("accion");
         
         if (op != null) {
-            String nombre = request.getParameter("nombre");
-            String curso = request.getParameter("curso");
-            String ciclo = request.getParameter("ciclo");
             Asignatura a = new Asignatura();
-            a.setNombre(nombre);
-            a.setCurso(curso);
-            a.setCiclo(ciclo);
-            
+            a.setNombre(request.getParameter("nombre"));
+            a.setCiclo(request.getParameter("ciclo"));
+            a.setCurso(request.getParameter("curso"));
+            int filas = 0;
+            boolean errorBorrar = false;
+
             switch (op) {
                 case "actualizar":
                     a.setId(Long.parseLong(request.getParameter("idasignatura")));
-                    as.updateAsignatura(a);
+                    filas = as.updateAsignatura(a);
                     break;
                 case "insertar":
                     a = as.addAsignatura(a);
+                    if (a != null) {
+                        filas = 1;
+                    }
                     break;
                 case "borrar":
                     a.setId(Long.parseLong(request.getParameter("idasignatura")));
-                    as.delAsignatura(a);
+                    filas = as.delAsignatura(a);
+                    if (filas == -1) {
+                        request.setAttribute("errorBorrar", "Si borras esta asignatura se borrarán todas las notas asociadas a ella.");
+                        request.setAttribute("asignatura", a);
+                        errorBorrar = true;
+                    }
                     break;
+                case "borrar2":
+                    a.setId(Long.parseLong(request.getParameter("idasignatura")));
+                    filas = as.delAsignatura2(a);
+                    break;
+            }
+            if (errorBorrar == false) {
+                if (filas != 0) {
+                    request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+                } else {
+                    request.setAttribute("mensaje", "No se han hecho modificaciones");
+                }
             }
         }
         request.setAttribute("asignaturas", as.getAllAsignaturas());

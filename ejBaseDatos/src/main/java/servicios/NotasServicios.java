@@ -1,14 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package servicios;
 
-/**
- *
- * @author daw
- */
+import dao.NotasDAO;
+import model.Nota;
+
 public class NotasServicios {
+    public Nota guardarNota(Nota nota){
+        NotasDAO dao = new NotasDAO();
+        return dao.guardarNota(nota);
+    }
     
+    public Nota getNota(Long idalu, Long idasig){
+        NotasDAO dao = new NotasDAO();
+        return dao.getNota(idalu, idasig);
+    }
+    
+    public int delNota(Nota nota){
+        NotasDAO dao = new NotasDAO();
+        return dao.delNota(nota);
+    }
 }

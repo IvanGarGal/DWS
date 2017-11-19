@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import model.Alumno;
@@ -11,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,10 +23,6 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
-/**
- *
- * @author oscar
- */
 public class AlumnosDAO {
 
     public List<Alumno> getAllAlumnos() {
@@ -142,6 +134,7 @@ public class AlumnosDAO {
 
         } catch (Exception ex) {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            a = null;
         } finally {
             db.cerrarConexion(con);
         }
@@ -167,27 +160,69 @@ public class AlumnosDAO {
         return user;
     }
 
-    public void delUser(Alumno a) {
+    public int delUser(Alumno a) {
         DBConnection db = new DBConnection();
         Connection con = null;
+        int filas = 0;
         try {
             con = db.getConnection();
             String sql = "DELETE FROM ALUMNOS WHERE ID = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
-            
+
             stmt.setLong(1, a.getId());
-            
-            stmt.executeUpdate();
+
+            filas = stmt.executeUpdate();
+
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            filas = -1;
         } catch (Exception ex) {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             db.cerrarConexion(con);
         }
+        return filas;
     }
 
-    public void updateUser(Alumno a) {
+    public int delUser2(Alumno a){
         DBConnection db = new DBConnection();
         Connection con = null;
+        int filas = 0;
+        try {
+            
+            con = db.getConnection();
+            con.setAutoCommit(false);
+            String sql = "DELETE FROM NOTAS WHERE ID_ALUMNO = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1, a.getId());
+            
+            filas += stmt.executeUpdate();
+            
+            sql = "DELETE FROM ALUMNOS WHERE ID = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setLong(1, a.getId());
+
+            filas += stmt.executeUpdate();
+            con.commit();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (con!=null)
+                    con.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } finally {
+            db.cerrarConexion(con);
+        }
+        return filas;
+    }
+    
+    public int updateUser(Alumno a) {
+        DBConnection db = new DBConnection();
+        Connection con = null;
+        int filas = 0;
         try {
             con = db.getConnection();
             String sql = "UPDATE ALUMNOS SET NOMBRE = ?, FECHA_NACIMIENTO = ?, MAYOR_EDAD = ? WHERE ID = ?";
@@ -198,12 +233,13 @@ public class AlumnosDAO {
             stmt.setBoolean(3, a.getMayor_edad());
             stmt.setLong(4, a.getId());
 
-            int filas = stmt.executeUpdate();
+            filas = stmt.executeUpdate();
         } catch (Exception ex) {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             db.cerrarConexion(con);
         }
+        return filas;
     }
 
     public int cambiarPassUser(String codigo, String password) {
