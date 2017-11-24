@@ -1,0 +1,14 @@
+{
+    "name": "vendor/ejercicio-base-datos-p-h-p",
+    "description": "Description of project ejercicioBaseDatosPHP.",
+    "authors": [
+        {
+            "name": "Miguel",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "joshcam/mysqli-database-class": "v2.8",
+        "stefangabos/zebra_pagination":"2.2.3"
+    }
+}
