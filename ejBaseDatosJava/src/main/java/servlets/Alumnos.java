@@ -83,7 +83,7 @@ public class Alumnos extends HttpServlet {
         // getAll siempre se hace
         
         // LE MANDO LA INFORMACIÓN AL " <c:forEach items="${alumnos}" var="alumno"> " DE pintarAlumnos.jsp
-        // "alumnos" está enlazado con "${alumnos}"
+        // "alumno" está enlazado con "${alumnos}"
         // "alumnos" contiene dentro la función "as.getAllAlumnos()" que lo que hace es mostrar los alumnos que hay dentro de la tabla
         // a "${alumnos}" le cambio el nombre "alumno" mediante var="alumno"
         request.setAttribute("alumnos", as.getAllAlumnos());
