@@ -1,0 +1,13 @@
+{
+    "name": "vendor/php-practica-d-b",
+    "description": "Description of project phpPracticaDB.",
+    "authors": [
+        {
+            "name": "dani",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "joshcam/mysqli-database-class": "v2.8"
+    }
+}
