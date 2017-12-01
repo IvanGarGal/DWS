@@ -1,0 +1,13 @@
+{
+    "name": "vendor/base-datos-php",
+    "description": "Description of project BaseDatosPhp.",
+    "authors": [
+        {
+            "name": "daw",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "joshcam/mysqli-database-class": "v2.8"
+    }
+}
