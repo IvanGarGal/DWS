@@ -1,0 +1,14 @@
+{
+    "name": "vendor/mi-base-datos-p-h-p",
+    "description": "Description of project MiBaseDatosPHP.",
+    "authors": [
+        {
+            "name": "DAW",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "joshcam/mysqli-database-class": "v2.8",
+        "stefangabos/zebra_pagination":"2.2.3"
+    }
+}
