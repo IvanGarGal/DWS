@@ -26,6 +26,7 @@ try {
         }
 
         switch ($accion) {
+            /*
             case "actualizar":
                 $id = $_REQUEST["id"];
                 $statement = $conn->prepare("UPDATE ALUMNOS SET NOMBRE = ?, FECHA_NACIMIENTO = ?, MAYOR_EDAD = ? WHERE ID = ?");
@@ -33,6 +34,8 @@ try {
                 $statement->execute();
                 $filas = mysqli_affected_rows($conn);
                 break;
+             
+             */
             case "guardar":
                 $statement = $conn->prepare("INSERT INTO ALUMNOS (NOMBRE,FECHA_NACIMIENTO,MAYOR_EDAD) VALUES(?,?,?)");
                 $statement->bind_param('ssi', $nombre, $fecha, $mayor);
@@ -47,6 +50,7 @@ try {
                 $statement->execute();
                 $filas = mysqli_affected_rows($conn);
                 break;
+            /*
             case "borrar2":
                 try {
                     mysqli_autocommit($conn, false);
@@ -70,6 +74,8 @@ try {
                     $filas = -1;
                 }
                 break;
+             
+             */
         }
         $mostrarMensaje = true;
         $error = mysqli_error($conn);
