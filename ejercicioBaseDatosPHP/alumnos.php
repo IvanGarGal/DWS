@@ -44,6 +44,8 @@ if (isset($_REQUEST["accion"])) {
             $statement->execute();
             $filas = mysqli_affected_rows($conn);
             $idGenerada = $conn -> insert_id;
+            // $idGenerada es la id autoincremental del ultimo insertado. No la uso para nada.
+            // Solo quería saber como recoger esa id.
             break;
         case "borrar":
             $id = $_REQUEST["id"];
@@ -91,6 +93,8 @@ if (isset($_REQUEST["accion"])) {
         $mostrarMensaje = false;
         $mensaje = "Si borras este alumno se borrarán todas sus notas.";
     }
+    
+    $statement->close();
 }
 
 //Estas filas son para la paginación, no tienen nada que ver con el ejercicio.
@@ -112,7 +116,6 @@ if (!$alumnos = $conn->query($sql)) {
     die('Ocurrió un error al hacer la consulta [' . $conn->error . ']');
 }
 $conn->close();
-
 ?>
 <html>
     <head>
@@ -134,12 +137,10 @@ $conn->close();
                 position: absolute;
                 top: 420px;
             }
-            .nombreAlumno{
-                width: 150px;
-                max-width: 150px;
-                height: 10px;
-                max-height: 10px;
-                overflow: hidden;
+            .nombreTabla{
+                width: 200px;
+                margin: 0 -10px;
+                border: none;
             }
         </style>
         <script>
@@ -181,15 +182,15 @@ $conn->close();
             <?php foreach ($alumnos as $alumno) { ?>
                 <tr>
                     <td class="boton">
-                        <input type="button" value="Cargar <?php echo $alumno['ID'] ?>"
-                               onclick="cargar('<?php echo $alumno['ID'] ?>',
-                               '<?php echo addslashes($alumno['NOMBRE']) ?>',
+                        <input type="button" value="Cargar <?php echo $alumno['ID']; ?>"
+                               onclick="cargar('<?php echo $alumno['ID']; ?>',
+                               '<?php echo htmlspecialchars(addslashes($alumno['NOMBRE']), ENT_QUOTES, 'UTF-8'); ?>',
                                '<?php $fecha = new DateTime($alumno['FECHA_NACIMIENTO']);
                                echo $fecha->format('d-m-Y');?>',
-                               '<?php echo $alumno['MAYOR_EDAD'] ?>')">
+                               '<?php echo $alumno['MAYOR_EDAD']; ?>')">
                     </td>
-                    <td class="nombreAlumno">
-                        <?php echo $alumno['NOMBRE']; ?>
+                    <td>
+                        <input class="nombreTabla" type="text" value="<?php echo htmlspecialchars($alumno['NOMBRE'], ENT_QUOTES, 'UTF-8'); ?>">
                     </td>
                     <td>
                         <?php
