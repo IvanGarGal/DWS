@@ -25,10 +25,6 @@ import utils.ConstantesError;
 
 import utils.SqlQuery;
 
-/**
- *
- * @author oscar
- */
 public class AlumnosDAO {
 
     public List<Alumno> getAllAlumnosJDBC() {
