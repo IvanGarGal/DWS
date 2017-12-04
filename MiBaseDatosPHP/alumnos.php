@@ -57,7 +57,6 @@
                                 $foreign = true;
                             }
                         }
-                        $ok = true;
                     } catch (Exception $ex) {
                         echo "PROBLEMA AL INSERTAR ALUMNO";
                     }
@@ -70,7 +69,6 @@
                         $mayor = 1;
                         $statement->bind_param('ssii', $nombre, $date_format, $mayor, $id);
                         $statement->execute();
-                        $ok = true;
                     } catch (Exception $exc) {
                         echo "PROBLEMA AL ACTUALIZAR ALUMNO";
                     }
@@ -97,7 +95,6 @@
                             $statement->execute();
                         }
                         $conn->commit();
-                        $ok = true;
                     } catch (Exception $ex) {
                         echo "PROBLEMA AL REMOVER AL ALUMNO COMPLETAMENTE";
                         $conn->rollback();
