@@ -6,24 +6,17 @@
 package dao;
 
 import model.Alumno;
-
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
-
 import java.util.ArrayList;
-import java.sql.Date;
-import java.sql.PreparedStatement;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.commons.dbutils.QueryRunner;
-
-import utils.ConstantesError;
-
-import utils.SqlQuery;
 
 public class AlumnosDAO {
 
@@ -37,16 +30,17 @@ public class AlumnosDAO {
         try {
             con = db.getConnection();
             stmt = con.createStatement();
-
-            rs = stmt.executeQuery(SqlQuery.SELECT_ALL_ALUMNOS);
+            String sql;
+            sql = "SELECT * FROM ALUMNOS";
+            rs = stmt.executeQuery(sql);
 
             //STEP 5: Extract data from result set
             while (rs.next()) {
                 //Retrieve by column name
-                int id = rs.getInt(SqlQuery.ID);
-                String nombre = rs.getString(SqlQuery.NOMBRE);
-                Date fn = rs.getDate(SqlQuery.FECHA_NACIMIENTO);
-                Boolean mayor = rs.getBoolean(SqlQuery.MAYOR_EDAD);
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                Date fn = rs.getDate("fecha_nacimiento");
+                Boolean mayor = rs.getBoolean("mayor_edad");
                 nuevo = new Alumno();
                 nuevo.setFecha_nacimiento(fn);
                 nuevo.setId(id);
@@ -75,156 +69,111 @@ public class AlumnosDAO {
 
     }
 
-    public boolean updateUserJDBC(Alumno alumno) {
-        boolean updated = false;
-        DBConnection dBConnection = new DBConnection();
-        Connection connection = null;
-
-        PreparedStatement stmt = null;
-        try {
-            connection = dBConnection.getConnection();
-
-            stmt = connection.prepareStatement(SqlQuery.UPDATE_ALUMNO);
-
-            stmt.setString(1, alumno.getNombre());
-            stmt.setDate(2, new java.sql.Date(alumno.getFecha_nacimiento().getTime()));
-            stmt.setBoolean(3, alumno.getMayor_edad());
-            stmt.setInt(4, (int) alumno.getId());
-
-            if (stmt.executeUpdate() > 0) {
-                updated = Boolean.TRUE;
-            }
-        } catch (Exception e) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            dBConnection.cerrarConexion(connection);
-        }
-        return updated;
-    }//fin update
-
-    public boolean insertUserJDBC(Alumno alumno) {
-        DBConnection dBConnection = new DBConnection();
-        Connection connection = null;
-        boolean insertado = false;
-        PreparedStatement stmt = null;
-        try {
-            connection = dBConnection.getConnection();
-
-            stmt = connection.prepareStatement(SqlQuery.INSERT_ALUMNO, Statement.RETURN_GENERATED_KEYS);
-
-            stmt.setString(1, alumno.getNombre());
-            stmt.setDate(2, new java.sql.Date(alumno.getFecha_nacimiento().getTime()));
-            stmt.setBoolean(3, alumno.getMayor_edad());
-
-            if (stmt.executeUpdate() > 0) {
-                insertado = Boolean.TRUE;
-            }
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                alumno.setId(rs.getInt(1));
-            }
-
-        } catch (Exception e) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            dBConnection.cerrarConexion(connection);
-
-        }
-        return insertado;
-
-    }//fin insert
-
-    public int deleteUserByIdJDBC(String id) {
-
-        int filasErased = -1;
-        DBConnection dBConnection = new DBConnection();
-        Connection connection = null;
-
-        PreparedStatement stmt = null;
-        try {
-            connection = dBConnection.getConnection();
-
-            stmt = connection.prepareStatement(SqlQuery.DELETE_ALUMNO);
-
-            stmt.setInt(1, Integer.valueOf(id));
-
-            filasErased = stmt.executeUpdate();
-
-        } catch (Exception e) {
-
-            if (e.getMessage().contains(ConstantesError.errorForeingkey)) {
-                filasErased = ConstantesError.CodeErrorClaveForanea;
-            }
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            dBConnection.cerrarConexion(connection);
-        }
-        return filasErased;
-    }
-
-    //DELETE_FORCE
-    public boolean deleteUserByIdForce(int id) throws SQLException {
-
-        int filasNota = -1;
-        int filasAlumno = -1;
-        boolean borrado = Boolean.FALSE;
+    public Alumno insertAlumnoJDBC(Alumno a) {
         DBConnection db = new DBConnection();
         Connection con = null;
-        PreparedStatement stmt = null;
-
         try {
             con = db.getConnection();
-            con.setAutoCommit(Boolean.FALSE);
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO ALUMNOS (NOMBRE,FECHA_NACIMIENTO,MAYOR_EDAD) VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-            stmt = con.prepareStatement(SqlQuery.DELETE_NOTA_ALUMNO);
-            stmt.setInt(1, id);
-            filasNota = stmt.executeUpdate();
+            stmt.setString(1, a.getNombre());
+            stmt.setDate(2, new java.sql.Date(a.getFecha_nacimiento().getTime()));
+            stmt.setBoolean(3, a.getMayor_edad());
 
-            stmt = con.prepareStatement(SqlQuery.DELETE_ALUMNO);
-            stmt.setInt(1, id);
-            filasAlumno = stmt.executeUpdate();
+            int filas = stmt.executeUpdate();
 
-            if (filasNota > 0 && filasAlumno > 0) {
-                borrado = Boolean.TRUE;
-                con.commit();
-            } else {
-                con.rollback();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                a.setId(rs.getInt(1));
             }
 
         } catch (Exception ex) {
-            if (con != null) {
-                con.rollback();
-            }
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            a = null;
+        } finally {
+            db.cerrarConexion(con);
+        }
+
+        return a;
+    }
+
+    public int updateUser(Alumno a) {
+        DBConnection db = new DBConnection();
+        Connection con = null;
+        int filas = 0;
+        try {
+            con = db.getConnection();
+            String sql = "UPDATE ALUMNOS SET NOMBRE = ?, FECHA_NACIMIENTO = ?, MAYOR_EDAD = ? WHERE ID = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+
+            stmt.setString(1, a.getNombre());
+            stmt.setDate(2, new java.sql.Date(a.getFecha_nacimiento().getTime()));
+            stmt.setBoolean(3, a.getMayor_edad());
+            stmt.setLong(4, a.getId());
+
+            filas = stmt.executeUpdate();
+        } catch (Exception ex) {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             db.cerrarConexion(con);
         }
-        return borrado;
-
+        return filas;
     }
 
-}//fin clase
+    public int delUser(Alumno a) {
+        Connection con = null;
+        int filas = 0;
+        try {
+            con = DBConnection.getInstance().getConnection();
+            String sql = "DELETE FROM ALUMNOS WHERE ID = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+
+            stmt.setLong(1, a.getId());
+
+            filas = stmt.executeUpdate();
+
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            filas = -1;
+        } catch (Exception ex) {
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            DBConnection.getInstance().cerrarConexion(con);
+        }
+        return filas;
+    }
+    
+    public int delUser2(Alumno a){
+        Connection con = null;
+        int filas = 0;
+        try {
+            con = DBConnection.getInstance().getConnection();
+            con.setAutoCommit(false);
+            String sql = "DELETE FROM NOTAS WHERE ID_ALUMNO = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1, a.getId());
+            
+            filas += stmt.executeUpdate();
+            
+            sql = "DELETE FROM ALUMNOS WHERE ID = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setLong(1, a.getId());
+
+            filas += stmt.executeUpdate();
+            con.commit();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (con!=null)
+                    con.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } finally {
+            DBConnection.getInstance().cerrarConexion(con);
+        }
+        return filas;
+    }
+
+}
