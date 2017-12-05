@@ -18,10 +18,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
 public class AlumnosDAO {
 
     public List<Alumno> getAllAlumnosJDBC() {
@@ -153,7 +149,6 @@ public class AlumnosDAO {
         Connection con = null;
         int filas = 0;
         try {
-            
             con = db.getConnection();
             con.setAutoCommit(false);
             String sql = "DELETE FROM NOTAS WHERE ID_ALUMNO = ?";
