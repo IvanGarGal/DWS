@@ -70,7 +70,6 @@ public class AlumnosDAO {
     }
 
     public Alumno insertAlumnoJDBC(Alumno a) {
-        DBConnection db = new DBConnection();
         Connection con = null;
         try {
             con = db.getConnection();
@@ -98,11 +97,10 @@ public class AlumnosDAO {
     }
 
     public int updateUser(Alumno a) {
-        DBConnection db = new DBConnection();
         Connection con = null;
         int filas = 0;
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
             String sql = "UPDATE ALUMNOS SET NOMBRE = ?, FECHA_NACIMIENTO = ?, MAYOR_EDAD = ? WHERE ID = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
 
@@ -115,7 +113,7 @@ public class AlumnosDAO {
         } catch (Exception ex) {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return filas;
     }

@@ -9,6 +9,6 @@ package dao;
  *
  * @author rafa
  */
-public class MailDAO {
+public class UsersDAO {
     
 }

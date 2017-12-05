@@ -28,7 +28,7 @@ import utils.SqlQuery;
  *
  * @author daw
  */
-@WebServlet(name = "AlumnosServlet", urlPatterns = {"/alumnos"})
+@WebServlet(name = "AlumnosServlet", urlPatterns = {"/secure/alumnos"})
 public class AlumnosServlet extends HttpServlet {
 
     /**
