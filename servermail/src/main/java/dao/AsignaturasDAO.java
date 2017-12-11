@@ -27,10 +27,10 @@ public class AsignaturasDAO {
 
     public List<Asignatura> getAllAsignaturasdbUtils() {
         List<Asignatura> lista = null;
-        DBConnection db = new DBConnection();
+        
         Connection con = null;
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
             QueryRunner qr = new QueryRunner();
             ResultSetHandler<List<Asignatura>> handler
               = new BeanListHandler<>(Asignatura.class);
@@ -39,17 +39,17 @@ public class AsignaturasDAO {
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return lista;
     }
 
     public boolean insertAsignaturadbUtils(Asignatura asignatura) {
-        DBConnection db = new DBConnection();
+        
         Connection con = null;
         boolean insertado = false;
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
             QueryRunner qr = new QueryRunner();
 
@@ -65,7 +65,7 @@ public class AsignaturasDAO {
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return insertado;
 
@@ -73,11 +73,11 @@ public class AsignaturasDAO {
 
     public int updateAsignaturasdbUtils(Asignatura asignatura) {
         int filas = -1;
-        DBConnection db = new DBConnection();
+      
         Connection con = null;
 
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
             QueryRunner qr = new QueryRunner();
 
@@ -91,7 +91,7 @@ public class AsignaturasDAO {
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
 
         return filas;
@@ -100,11 +100,11 @@ public class AsignaturasDAO {
     public int deleteAsignaturadbUtils(String id) {
         int filasErased = -1;
 
-        DBConnection db = new DBConnection();
+        
         Connection con = null;
 
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
             QueryRunner qr = new QueryRunner();
 
@@ -118,7 +118,7 @@ public class AsignaturasDAO {
             }
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return filasErased;
     }
@@ -127,11 +127,11 @@ public class AsignaturasDAO {
         int filasNota = -1;
         int filasAsigantura = -1;
         boolean borrado = Boolean.FALSE;
-        DBConnection db = new DBConnection();
+        
         Connection con = null;
 
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
             con.setAutoCommit(Boolean.FALSE);
             QueryRunner qr = new QueryRunner();
 
@@ -155,7 +155,7 @@ public class AsignaturasDAO {
             }
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return borrado;
     }

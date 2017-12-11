@@ -30,14 +30,14 @@ public class NotasDAO {
 
     public Nota getNotaJDBC(int idAlumno, int idAsignatura) {
         Nota nota = null;
-        DBConnection dBConnection = new DBConnection();
-        Connection connection = null;
+       
+        Connection con = null;
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            connection = dBConnection.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
-            stmt = connection.prepareStatement(SqlQuery.SELECT_NOTA);
+            stmt = con.prepareStatement(SqlQuery.SELECT_NOTA);
 
             stmt.setInt(1, idAsignatura);
             stmt.setInt(2, idAlumno);
@@ -67,7 +67,7 @@ public class NotasDAO {
                 Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            dBConnection.cerrarConexion(connection);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return nota;
     }
@@ -75,11 +75,11 @@ public class NotasDAO {
     public boolean updateNotadbUtils(Nota nota) {
         int filas = -1;
         boolean updated = false;
-        DBConnection db = new DBConnection();
+    
         Connection con = null;
 
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
             QueryRunner qr = new QueryRunner();
 
@@ -95,7 +95,7 @@ public class NotasDAO {
         } catch (Exception ex) {
             Logger.getLogger(NotasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
 
         return updated;
@@ -104,14 +104,14 @@ public class NotasDAO {
     
 
     public boolean insertUserJDBC(Nota nota) {
-        DBConnection dBConnection = new DBConnection();
-        Connection connection = null;
+        
+        Connection con = null;
         boolean insertado = false;
         PreparedStatement stmt = null;
         try {
-            connection = dBConnection.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
-            stmt = connection.prepareStatement(SqlQuery.INSERT_NOTAS);
+            stmt = con.prepareStatement(SqlQuery.INSERT_NOTAS);
 
             stmt.setInt(1, (int) nota.getId_alumno());
             stmt.setInt(2, (int) nota.getId_asignatura());
@@ -132,7 +132,7 @@ public class NotasDAO {
                 Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            dBConnection.cerrarConexion(connection);
+            DBConnection.getInstance().cerrarConexion(con);
 
         }
         return insertado;
@@ -142,11 +142,11 @@ public class NotasDAO {
     public boolean deleteNotadbUtils(int key) {
         int filas = -1;
         boolean borrado = Boolean.FALSE;
-        DBConnection db = new DBConnection();
+        
         Connection con = null;
 
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
 
             QueryRunner qr = new QueryRunner();
 
@@ -160,7 +160,7 @@ public class NotasDAO {
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return borrado;
     }

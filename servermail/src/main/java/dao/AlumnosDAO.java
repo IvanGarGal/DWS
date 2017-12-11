@@ -23,12 +23,11 @@ public class AlumnosDAO {
     public List<Alumno> getAllAlumnosJDBC() {
         List<Alumno> lista = new ArrayList<>();
         Alumno nuevo = null;
-        DBConnection db = new DBConnection();
         Connection con = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
             stmt = con.createStatement();
             String sql;
             sql = "SELECT * FROM ALUMNOS";
@@ -42,7 +41,7 @@ public class AlumnosDAO {
                 Date fn = rs.getDate("fecha_nacimiento");
                 Boolean mayor = rs.getBoolean("mayor_edad");
                 nuevo = new Alumno();
-                nuevo.setFecha_nacimiento(fn);
+                nuevo.setFecha_nacimiento((java.sql.Date) fn);
                 nuevo.setId(id);
                 nuevo.setMayor_edad(mayor);
                 nuevo.setNombre(nombre);
@@ -63,7 +62,7 @@ public class AlumnosDAO {
                 Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
         return lista;
 
@@ -72,7 +71,7 @@ public class AlumnosDAO {
     public Alumno insertAlumnoJDBC(Alumno a) {
         Connection con = null;
         try {
-            con = db.getConnection();
+            con = DBConnection.getInstance().getConnection();
             PreparedStatement stmt = con.prepareStatement("INSERT INTO ALUMNOS (NOMBRE,FECHA_NACIMIENTO,MAYOR_EDAD) VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, a.getNombre());
@@ -90,7 +89,7 @@ public class AlumnosDAO {
             Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
             a = null;
         } finally {
-            db.cerrarConexion(con);
+            DBConnection.getInstance().cerrarConexion(con);
         }
 
         return a;

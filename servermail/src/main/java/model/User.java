@@ -56,6 +56,10 @@ public class User {
         return fecha_activacion;
     }
     
+    public void setFechaActivacion(Date fecha_activacion) {
+        this.fecha_activacion = fecha_activacion;
+    }
+    
     public String getEmail() {
         return email;
     }
