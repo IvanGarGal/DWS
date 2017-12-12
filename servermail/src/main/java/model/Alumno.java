@@ -5,11 +5,11 @@
  */
 package model;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  *
- * @author oscar
+ * @author Miguel Angel Diaz
  */
 public class Alumno {
     

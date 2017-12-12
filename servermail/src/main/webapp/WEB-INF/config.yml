@@ -1,7 +1,8 @@
 ## YAML Template.
 ---
 driverDB: com.mysql.jdbc.Driver
-urlDB: jdbc:mysql://localhost:3306/clasesdaw?useSSL=false
+urlDB: jdbc:mysql://localhost:3306/clasesdaw
+## urlDB: jdbc:mysql://localhost:3306/clasesdaw?useSSL=false
 userDB: root
 passDB: nohay2sin3
 mailFrom: alumno1@iesquevedo.es

@@ -9,6 +9,6 @@ package servicios;
  *
  * @author rafa
  */
-public class MailServicios {
+public class MandarMail {
     
 }

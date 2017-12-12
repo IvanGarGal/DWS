@@ -10,31 +10,26 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import model.Asignatura;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import utils.ConstantesError;
-import utils.SqlQuery;
 
 /**
  *
- * @author oscar
+ * @author Miguel Angel Diaz
  */
 public class AsignaturasDAO {
 
-    public List<Asignatura> getAllAsignaturasdbUtils() {
+    public List<Asignatura> getAllAsignaturas() {
         List<Asignatura> lista = null;
-        
         Connection con = null;
         try {
             con = DBConnection.getInstance().getConnection();
             QueryRunner qr = new QueryRunner();
-            ResultSetHandler<List<Asignatura>> handler
-              = new BeanListHandler<>(Asignatura.class);
-            lista = qr.query(con, SqlQuery.SELECT_ALL_ASIGNATURAS, handler);
+            ResultSetHandler<List<Asignatura>> h = new BeanListHandler<Asignatura>(Asignatura.class);
+            lista = qr.query(con, "select * FROM ASIGNATURAS", h);
 
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -44,120 +39,85 @@ public class AsignaturasDAO {
         return lista;
     }
 
-    public boolean insertAsignaturadbUtils(Asignatura asignatura) {
-        
+    public Asignatura addAsignatura(Asignatura a) {
         Connection con = null;
-        boolean insertado = false;
         try {
             con = DBConnection.getInstance().getConnection();
-
+            con.setAutoCommit(false);
             QueryRunner qr = new QueryRunner();
-
             long id = qr.insert(con,
-              SqlQuery.INSERT_ASIGNATURA,
-              new ScalarHandler<Long>(),
-              asignatura.getNombre(), asignatura.getCurso(), asignatura.getCiclo());
-            asignatura.setId(id);
-            if (id > 0) {
-                insertado = Boolean.TRUE;
-            }
-
+                    "INSERT INTO ASIGNATURAS (NOMBRE,CICLO,CURSO) VALUES(?,?,?)",
+                    new ScalarHandler<Long>(), a.getNombre(), a.getCiclo(), a.getCurso());
+           
+            a.setId(id);
+            con.commit();
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            a = null;
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-        return insertado;
-
+        return a;
     }
 
-    public int updateAsignaturasdbUtils(Asignatura asignatura) {
-        int filas = -1;
-      
+    public int updateAsignatura(Asignatura a) {
         Connection con = null;
-
+        int filas = 0;
         try {
             con = DBConnection.getInstance().getConnection();
-
             QueryRunner qr = new QueryRunner();
-
-            filas = qr.update(con,
-              SqlQuery.UPDATE_ASIGNATURA,
-              asignatura.getNombre(),
-              asignatura.getCurso(),
-              asignatura.getCiclo(),
-              asignatura.getId());
+            filas = qr.update(con, "UPDATE ASIGNATURAS SET NOMBRE = ?, CICLO = ?, CURSO = ? WHERE ID = ?", a.getNombre(), a.getCiclo(), a.getCurso(), a.getId());
 
         } catch (Exception ex) {
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-
         return filas;
     }
 
-    public int deleteAsignaturadbUtils(String id) {
-        int filasErased = -1;
-
-        
+    public int delAsignatura(Asignatura a) {
         Connection con = null;
-
+        int filas = 0;
         try {
             con = DBConnection.getInstance().getConnection();
-
             QueryRunner qr = new QueryRunner();
-
-            filasErased = qr.update(con,
-              SqlQuery.DELETE_ASIGNATURA,
-              id);
+            filas = qr.update(con, "DELETE FROM ASIGNATURAS WHERE ID = ?", a.getId());
 
         } catch (Exception ex) {
-            if (ex.getMessage().contains(ConstantesError.errorForeingkey)) {
-                filasErased = ConstantesError.CodeErrorClaveForanea;
+            if (ex.getMessage().contains("foreign")){
+                filas = -1;
             }
             Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-        return filasErased;
+        return filas;
     }
-
-    public boolean deleteAsignaturadbUtilsForce(int key) throws SQLException {
-        int filasNota = -1;
-        int filasAsigantura = -1;
-        boolean borrado = Boolean.FALSE;
-        
+    
+    public int delAsignatura2(Asignatura a) {
         Connection con = null;
-
+        int filas = 0;
         try {
             con = DBConnection.getInstance().getConnection();
-            con.setAutoCommit(Boolean.FALSE);
+            con.setAutoCommit(false);
             QueryRunner qr = new QueryRunner();
-
-            filasNota = qr.update(con,
-              SqlQuery.DELETE_NOTA_ASIGNATURA,
-              key);
-            filasAsigantura = qr.update(con,
-              SqlQuery.DELETE_ASIGNATURA,
-              key);
-
-            if (filasNota > 0 && filasAsigantura > 0) {
-                borrado = Boolean.TRUE;
-                con.commit();
-            } else {
-                con.rollback();
-            }
+            filas += qr.update(con, "DELETE FROM NOTAS WHERE ID_ASIGNATURA = ?", a.getId());
+            filas += qr.update(con, "DELETE FROM ASIGNATURAS WHERE ID = ?", a.getId());
+            
+            con.commit();
 
         } catch (Exception ex) {
-            if (con != null) {
-                con.rollback();
+            Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (con!=null)
+                    con.rollback();
+            } catch (SQLException ex1) {
+                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex1);
             }
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-        return borrado;
+        return filas;
     }
-
-}//Fin clase
+}

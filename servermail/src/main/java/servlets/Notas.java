@@ -6,8 +6,6 @@
 package servlets;
 
 import java.io.IOException;
-
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,14 +15,13 @@ import model.Nota;
 import servicios.AlumnosServicios;
 import servicios.AsignaturasServicios;
 import servicios.NotasServicios;
-import utils.Constantes;
 
 /**
  *
- * @author daw
+ * @author Miguel Angel Diaz
  */
-@WebServlet(name = "NotasServlet", urlPatterns = {"/notas"})
-public class NotasServlet extends HttpServlet {
+@WebServlet(name = "Notas", urlPatterns = {"/notas"})
+public class Notas extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,63 +34,59 @@ public class NotasServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        NotasServicios ns = new NotasServicios();
+        AlumnosServicios alums = new AlumnosServicios();
+        AsignaturasServicios asigs = new AsignaturasServicios();
+        String op = request.getParameter("accion");
+        String idAlu = request.getParameter("idAlumno");
+        String idAsig = request.getParameter("idAsignatura");
+        String nomAlu = request.getParameter("nombreAlumno");
+        String nomAsig = request.getParameter("nombreAsignatura");
+        String nota = request.getParameter("nota");
+        boolean cargar = false;
 
-        NotasServicios serviciosNotas = new NotasServicios();
-        AlumnosServicios alumnosServicios = new AlumnosServicios();
-        AsignaturasServicios asignaturasServicios = new AsignaturasServicios();
-        Nota nota = null;
-        Nota claves = null;
-        
-        String action = request.getParameter(Constantes.actionJSP);
-        Map<String, String[]> parametros = null;
-        
-        if (action != null && !action.isEmpty()) {
+        if (op != null) {
+            Nota n = new Nota();
+            n.setIdAlumno(Long.parseLong(idAlu));
+            n.setIdAsignatura(Long.parseLong(idAsig));
+            int filas = 0;
 
-            parametros = request.getParameterMap();
-            claves = serviciosNotas.tratarParametros(parametros);
-
-            switch (action) {
-                case Constantes.VIEW://buscamos la nota 
-
-                    nota = serviciosNotas.getNota(claves);
-
-                    if (nota != null) {
-                        request.setAttribute(Constantes.notaResult, nota);
-                    } else {
-                        request.setAttribute(Constantes.RESULTADO_QUERY, Constantes.messageQueryNotaMissing);
-                        claves.setNota(-1);//no tenemos nota la base de datos
-
+            switch (op) {
+                case "guardar":
+                    n.setNota(Integer.parseInt(nota));
+                    n = ns.guardarNota(n);
+                    if (n != null) {
+                        filas = 1;
                     }
-
+                    request.setAttribute("nota", n);
                     break;
-
-                case Constantes.UPDATE:
-                    //actualizar nota
-                    //1* consultar en notas
-                    //si -> update
-                    //no -> insert
-                    boolean resultado = Boolean.FALSE;
-                    if (serviciosNotas.getNota(claves) != null) {
-                        resultado = serviciosNotas.updateNota(claves);
-                    } else {
-                        resultado = serviciosNotas.insertNota(claves);
+                case "borrar":
+                    filas = ns.delNota(n);
+                    break;
+                case "cargar":
+                    n = ns.getNota(n.getIdAlumno(), n.getIdAsignatura());
+                    cargar = true;
+                    if (n == null) {
+                        request.setAttribute("mensaje", "No hay notas");
+                    }else{
+                        request.setAttribute("nota", n);
                     }
-                    request.setAttribute(Constantes.notaMessage, (resultado) ? Constantes.messageQueryNotaUpdated : Constantes.messageQueryNotaUpdatedFail);
-
                     break;
-
             }
-
+            if (filas != 0 && cargar == false) {
+                request.setAttribute("mensaje", filas + " filas modificadas correctamente");
+            } else if (filas == 0 && cargar == false) {
+                request.setAttribute("mensaje", "No se han hecho modificaciones");
+            }
         }
-
-        if (claves != null) {
-            request.setAttribute(Constantes.notaResult, claves);
-        }
-        request.setAttribute(Constantes.asignaturasList, asignaturasServicios.getAllAsignaturasdbUtils());//envia la lista al jsp
-        request.setAttribute(Constantes.ALUMNOS_LIST, alumnosServicios.getAllAlumnos());
-
-        request.getRequestDispatcher(Constantes.NOTAS_JSP).forward(request, response);
-
+        // getAll siempre se hace
+        request.setAttribute("asignaturas", asigs.getAllAsignaturas());
+        request.setAttribute("alumnos", alums.getAllAlumnos());
+        request.setAttribute("nomAlu", nomAlu);
+        request.setAttribute("idAlu", idAlu);
+        request.setAttribute("nomAsig", nomAsig);
+        request.setAttribute("idAsig", idAsig);
+        request.getRequestDispatcher("pintarListaNotas.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

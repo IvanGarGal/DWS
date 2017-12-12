@@ -7,38 +7,34 @@ package model;
 
 /**
  *
- * @author daw
+ * @author Miguel Angel Diaz
  */
 public class Nota {
-    private long id_alumno;
-    private long id_asignatura;
+    
+    private Long idAlumno;
+    private Long idAsignatura;
     private int nota;
-
-    public Nota() {
-    }
-
-    public long getId_alumno() {
-        return id_alumno;
-    }
-
-    public void setId_alumno(long id_alumno) {
-        this.id_alumno = id_alumno;
-    }
-
-    public long getId_asignatura() {
-        return id_asignatura;
-    }
-
-    public void setId_asignatura(long id_asignatura) {
-        this.id_asignatura = id_asignatura;
-    }
-
-    public int getNota() {
-        return nota;
-    }
-
-    public void setNota(int nota) {
-        this.nota = nota;
+    
+    public Nota(){
     }
     
-}//fin clase
+    public void setIdAlumno(Long idAlumno){
+        this.idAlumno=idAlumno;
+    }
+    public void setIdAsignatura(Long idAsignatura){
+        this.idAsignatura=idAsignatura;
+    }
+    public void setNota(int nota){
+        this.nota=nota;
+    }
+    
+    public Long getIdAlumno(){
+        return idAlumno;
+    }
+    public Long getIdAsignatura(){
+        return idAsignatura;
+    }
+    public int getNota(){
+        return nota;
+    }
+}

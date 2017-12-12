@@ -6,80 +6,37 @@
 package servicios;
 
 import dao.AsignaturasDAO;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import model.Asignatura;
-
-import utils.SqlQuery;
+import java.util.List;
 
 /**
  *
- * @author daw
+ * @author Miguel Angel Diaz
  */
 public class AsignaturasServicios {
 
-    AsignaturasDAO dao;
-
-    public AsignaturasServicios() {
-        dao = new AsignaturasDAO();
+    public List<Asignatura> getAllAsignaturas() {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.getAllAsignaturas();
     }
 
-    public List<Asignatura> getAllAsignaturasdbUtils() {
-
-        return dao.getAllAsignaturasdbUtils();
+    public Asignatura addAsignatura(Asignatura a) {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.addAsignatura(a);
     }
 
-    public boolean insertAsignaturadbUtils(Asignatura a) {
-        return dao.insertAsignaturadbUtils(a);
+    public int updateAsignatura(Asignatura a) {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.updateAsignatura(a);
     }
 
-    public int updateAsignaturadbUtils(Asignatura asignatura) {
-        return dao.updateAsignaturasdbUtils(asignatura);
+    public int delAsignatura(Asignatura a) {
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.delAsignatura(a);
     }
-
-    public int deleteAsignaturadbUtils(String key) {
-        return dao.deleteAsignaturadbUtils(key);
+    
+    public int delAsignatura2(Asignatura a){
+        AsignaturasDAO dao = new AsignaturasDAO();
+        return dao.delAsignatura2(a);
     }
-
-    public Asignatura tratarParametros(Map<String, String[]> parametros) throws UnsupportedEncodingException {
-        Asignatura asignatura = null;
-        if (parametros != null && !parametros.isEmpty()) {
-
-            asignatura = new Asignatura();
-
-            Iterator<String> it = parametros.keySet().iterator();
-
-            while (it.hasNext()) {
-                String key = (String) it.next();
-                String[] values = (String[]) parametros.get(key);
-                if (values[0] != null && !values[0].isEmpty()) {
-
-                    if (SqlQuery.ID.equalsIgnoreCase(key)) {
-                        asignatura.setId(Long.valueOf(values[0]));
-                    } else if (SqlQuery.NOMBRE.equalsIgnoreCase(key)) {
-                        asignatura.setNombre(values[0]);
-                    } else if (SqlQuery.CURSO.equalsIgnoreCase(key)) {
-
-                        asignatura.setCurso(values[0]);
-
-                    } else if (SqlQuery.CICLO.equalsIgnoreCase(key)) {
-                        asignatura.setCiclo(values[0]);
-
-                    }
-                }
-
-            }
-
-        }
-        return asignatura;
-    }
-
-    public boolean deleteAsignaturaForce(int i) throws SQLException {
-        return dao.deleteAsignaturadbUtilsForce(i);
-    }
-}//FIN CLASE
+}

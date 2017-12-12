@@ -6,163 +6,70 @@
 package dao;
 
 import java.sql.Connection;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import model.Nota;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 
-import utils.SqlQuery;
-
-/**
- *
- * @author daw
- */
 public class NotasDAO {
 
-   
-
-    public Nota getNotaJDBC(int idAlumno, int idAsignatura) {
-        Nota nota = null;
-       
+    public Nota guardarNota(Nota n) {
         Connection con = null;
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
+        int filas = 0;
         try {
             con = DBConnection.getInstance().getConnection();
+            QueryRunner qr = new QueryRunner();
+            filas = qr.update(con, "UPDATE NOTAS SET NOTA = ? WHERE ID_ALUMNO = ? AND ID_ASIGNATURA = ?", n.getNota(), n.getIdAlumno(), n.getIdAsignatura());
 
-            stmt = con.prepareStatement(SqlQuery.SELECT_NOTA);
-
-            stmt.setInt(1, idAsignatura);
-            stmt.setInt(2, idAlumno);
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                //Retrieve by column name
-                int idAl = rs.getInt(SqlQuery.ID_ALUMNO);
-                int idAs = rs.getInt(SqlQuery.ID_ASIGNATURA);
-                int notaRs = rs.getInt(SqlQuery.NOTA);
-
-                nota = new Nota();
-                nota.setId_alumno(idAl);
-                nota.setId_asignatura(idAs);
-                nota.setNota(notaRs);
+            if (filas == 0) {
+                con.setAutoCommit(false);
+                Long id = qr.insert(con,
+                        "INSERT INTO NOTAS (ID_ALUMNO,ID_ASIGNATURA,NOTA) VALUES(?,?,?)",
+                        new ScalarHandler<Long>(), n.getIdAlumno(), n.getIdAsignatura(), n.getNota());
+                con.commit();
             }
-
-        } catch (Exception e) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, e);
+        } catch (Exception ex) {
+            Logger.getLogger(NotasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            n = null;
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
             DBConnection.getInstance().cerrarConexion(con);
         }
-        return nota;
+        return n;
     }
 
-    public boolean updateNotadbUtils(Nota nota) {
-        int filas = -1;
-        boolean updated = false;
-    
+    public int delNota(Nota n) {
         Connection con = null;
-
+        int filas = 0;
         try {
             con = DBConnection.getInstance().getConnection();
-
             QueryRunner qr = new QueryRunner();
+            filas = qr.update(con, "DELETE FROM NOTAS WHERE ID_ALUMNO = ? AND ID_ASIGNATURA = ?", n.getIdAlumno(), n.getIdAsignatura());
 
-            filas = qr.update(con,
-                    SqlQuery.UPDATE_NOTA,
-                    nota.getNota(),
-                    nota.getId_alumno(),
-                    nota.getId_asignatura());
-
-            if (filas > 0) {
-                updated = true;
-            }
         } catch (Exception ex) {
             Logger.getLogger(NotasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-
-        return updated;
+        return filas;
     }
 
-    
-
-    public boolean insertUserJDBC(Nota nota) {
-        
+    public Nota getNota(Long idAlu, Long idAsig) {
         Connection con = null;
-        boolean insertado = false;
-        PreparedStatement stmt = null;
+        Nota n = null;
         try {
             con = DBConnection.getInstance().getConnection();
-
-            stmt = con.prepareStatement(SqlQuery.INSERT_NOTAS);
-
-            stmt.setInt(1, (int) nota.getId_alumno());
-            stmt.setInt(2, (int) nota.getId_asignatura());
-            stmt.setInt(3, nota.getNota());
-
-            if (stmt.executeUpdate() > 0) {
-                insertado = Boolean.TRUE;
-            }
-
-        } catch (Exception e) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            DBConnection.getInstance().cerrarConexion(con);
-
-        }
-        return insertado;
-
-    }//fin insert
-
-    public boolean deleteNotadbUtils(int key) {
-        int filas = -1;
-        boolean borrado = Boolean.FALSE;
-        
-        Connection con = null;
-
-        try {
-            con = DBConnection.getInstance().getConnection();
-
             QueryRunner qr = new QueryRunner();
-
-            filas = qr.update(con,
-                    SqlQuery.DELETE_NOTA_ALUMNO,
-                    key);
-            if (filas > 0) {
-                borrado = Boolean.TRUE;
-            }
+            ResultSetHandler<Nota> h = new BeanHandler<>(Nota.class);
+            n = qr.query(con, "SELECT * FROM NOTAS WHERE ID_ALUMNO = ? AND ID_ASIGNATURA = ?", h, idAlu, idAsig);
 
         } catch (Exception ex) {
-            Logger.getLogger(AsignaturasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NotasDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DBConnection.getInstance().cerrarConexion(con);
         }
-        return borrado;
+        return n;
     }
-
-}//fin clase
+}
