@@ -8,10 +8,6 @@ package utils;
 import java.security.SecureRandom;
 import java.util.Random;
 
-/**
- *
- * @author oscar
- */
 public class Utils {
 
     private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

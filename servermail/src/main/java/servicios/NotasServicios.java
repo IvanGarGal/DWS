@@ -8,10 +8,6 @@ package servicios;
 import dao.NotasDAO;
 import model.Nota;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
 public class NotasServicios {
     public Nota guardarNota(Nota n){
         NotasDAO dao = new NotasDAO();

@@ -9,10 +9,6 @@ import dao.AlumnosDAO;
 import java.util.List;
 import model.Alumno;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
 public class AlumnosServicios {
 
     public List<Alumno> getAllAlumnos() {

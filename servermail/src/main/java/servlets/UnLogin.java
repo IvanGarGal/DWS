@@ -13,10 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author user
- */
+
 @WebServlet(name = "UnLogin", urlPatterns = {"/unLogin"})
 public class UnLogin extends HttpServlet {
 

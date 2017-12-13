@@ -11,10 +11,7 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 import org.yaml.snakeyaml.Yaml;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
+
 public class Configuration {
 
     private static Configuration config;

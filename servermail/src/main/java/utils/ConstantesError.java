@@ -5,10 +5,6 @@
  */
 package utils;
 
-/**
- *
- * @author daw
- */
 public class ConstantesError {
     
     public static int CodeErrorClaveForanea = -5000;

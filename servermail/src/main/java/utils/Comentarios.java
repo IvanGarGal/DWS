@@ -5,10 +5,7 @@
  */
 package utils;
 
-/**
- *
- * @author rafa
- */
+
 public class Comentarios {
     
     //LO QUE HAY EN ESTE DOCUMENTO NO SE DEBE TENER EN CUENTA. SON TROZOS DEL PROGRAMA QUE NO ME INTERESA PERDER

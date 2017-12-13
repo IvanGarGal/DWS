@@ -16,10 +16,7 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
+
 public class AsignaturasDAO {
 
     public List<Asignatura> getAllAsignaturas() {

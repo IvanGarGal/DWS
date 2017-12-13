@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.User;
 import dao.UsersDAO;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import servicios.MandarMail;
 import servicios.NotasServicios;
 import servicios.UserServicios;
@@ -54,6 +56,7 @@ public class Users extends HttpServlet {
         String code_act;
         User usuario = new User();
         UsersDAO dao = new UsersDAO();
+        UserServicios servicios = null;
         if (op != null) {
             switch (op) {
                 case "REGISTRO":
@@ -68,19 +71,21 @@ public class Users extends HttpServlet {
                     }
                     break;
                 case "ACCESO":
-                    UserServicios servicios = null;
                     servicios = new UserServicios();
                     servicios.ver(nombre);
                     usuario = servicios.ver(nombre);
-
-
-                break;
+                    break;
                 case "ACTIVACION":
-                    UserServicios servicios = null;
                     servicios = new UserServicios();
                     servicios.activar(nombre);
+                    break;
+            }
         }
-        request.getRequestDispatcher(pagina).forward(request, response);
+        // getAll siempre se hace
+
+        request.getRequestDispatcher("usuarios.jsp").forward(request, response);
+    }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -93,7 +98,13 @@ public class Users extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Users.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(Users.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -107,7 +118,13 @@ public class Users extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Users.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(Users.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

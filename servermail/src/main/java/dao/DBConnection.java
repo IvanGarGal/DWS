@@ -23,10 +23,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-/**
- *
- * @author oscar
- */
+
 public class DBConnection {
 
     private static DBConnection dbconection = null;
