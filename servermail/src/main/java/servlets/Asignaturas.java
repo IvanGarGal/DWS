@@ -14,11 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.Asignatura;
 import servicios.AsignaturasServicios;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
-@WebServlet(name = "Asignaturas", urlPatterns = {"/asignaturas"})
+@WebServlet(name = "Asignaturas", urlPatterns = {"secure/asignaturas"})
 public class Asignaturas extends HttpServlet {
 
     /**

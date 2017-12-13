@@ -1,9 +1,3 @@
-<%-- 
-    Document   : pintarListaAsignaturas
-    Created on : 07-nov-2017, 9:44:08
-    Author     : Miguel Angel Diaz
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" 
            uri="http://java.sun.com/jsp/jstl/core" %>

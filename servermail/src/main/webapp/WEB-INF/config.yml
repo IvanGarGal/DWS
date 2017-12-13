@@ -10,4 +10,6 @@ smtpServer: smtp.gmail.com
 smtpPort: 587
 mailPass: alumnodam2
 
+tiempo: 1000;
+
 ##passDB: clasesdaw

@@ -6,7 +6,10 @@
 package servlets;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -15,11 +18,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import servicios.AlumnosServicios;
-import model.Alumno;
+import model.User;
+import dao.UsersDAO;
+import servicios.MandarMail;
+import servicios.NotasServicios;
+import servicios.UserServicios;
+import util.PasswordHash;
+import utils.Utils;
 
-@WebServlet(name = "Alumnos", urlPatterns = {"secure/alumnos"})
-public class Alumnos extends HttpServlet {
+
+@WebServlet(name = "Users", urlPatterns = {"/user"})
+public class Users extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,64 +40,47 @@ public class Alumnos extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        AlumnosServicios as = new AlumnosServicios();
+            throws ServletException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+ 
         String op = request.getParameter("accion");
-
+        String nombre = request.getParameter("nombre");
+        String password = request.getParameter("password");
+        String pagina;
+        String cod_activacion = request.getParameter("cod_activacion");
+        LocalDateTime fecha_activacion = LocalDateTime.now();
+        String email = request.getParameter("email");
+        String hasheo = PasswordHash.getInstance().createHash(password);
+        String cod = Utils.randomAlphaNumeric(15);
+        String code_act;
+        User usuario = new User();
+        UsersDAO dao = new UsersDAO();
         if (op != null) {
-            String nombre = request.getParameter("nombre");
-            String fecha = request.getParameter("fecha");
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate fechaNacimiento = LocalDate.parse(fecha, dtf);
-            boolean mayor;
-            mayor = request.getParameter("mayor") != null;
-            Alumno a = new Alumno();
-            a.setNombre(nombre);
-            a.setFecha_nacimiento(Date.from(fechaNacimiento.atStartOfDay().toInstant(ZoneOffset.UTC)));
-            a.setMayor_edad(mayor);
-            int filas = 0;
-            boolean errorBorrar = false;
-
             switch (op) {
-                case "actualizar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    filas = as.updateAlumno(a);
-                    break;
-                case "insertar":
-                    a = as.addAlumno(a);
-                    if (a != null) {
-                        filas = 1;
+                case "REGISTRO":
+                    if (usuario == null) {   
+                        usuario.setNombre(nombre);
+                        usuario.setPassword(password);
+                        usuario.setCodActivacion(cod_activacion);
+                        //usuario.setFechaActivacion(fecha_activacion);
+                    }
+                    else {
+                        request.setAttribute("mensaje", "YA EXISTE EL USUARIO");
                     }
                     break;
-                case "borrar":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    filas = as.delAlumno(a);
-                    if (filas == -1) {
-                        request.setAttribute("errorBorrar", "Si borras este alumno se borrarán todas sus notas.");
-                        request.setAttribute("alumno", a);
-                        request.setAttribute("fecha", fecha);
-                        errorBorrar = true;
-                    }
-                    break;
-                case "borrar2":
-                    a.setId(Long.parseLong(request.getParameter("idalumno")));
-                    filas = as.delAlumno2(a);
-            }
-            if (errorBorrar == false) {
-                if (filas != 0) {
-                    request.setAttribute("mensaje", filas + " filas modificadas correctamente");
-                } else {
-                    request.setAttribute("mensaje", "No se han hecho modificaciones");
-                }
-            }
+                case "ACCESO":
+                    UserServicios servicios = null;
+                    servicios = new UserServicios();
+                    servicios.ver(nombre);
+                    usuario = servicios.ver(nombre);
+
+
+                break;
+                case "ACTIVACION":
+                    UserServicios servicios = null;
+                    servicios = new UserServicios();
+                    servicios.activar(nombre);
         }
-        // getAll siempre se hace
-        request.setAttribute("alumnos", as.getAllAlumnos());
-        request.getRequestDispatcher("pintarListaAlumnos.jsp").forward(request, response);
-
-    }
-
+        request.getRequestDispatcher(pagina).forward(request, response);
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

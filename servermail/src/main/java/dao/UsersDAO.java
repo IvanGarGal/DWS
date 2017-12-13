@@ -1,5 +1,7 @@
 package dao;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import model.User;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -24,6 +26,7 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,99 +37,55 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class UsersDAO {
-    public List<User> getAllAlumnosJDBC() {
-        List<User> lista = new ArrayList<>();
-        User nuevo = null;
-        Connection con = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            con = DBConnection.getInstance().getConnection();
-            stmt = con.createStatement();
-            String sql;
-            sql = "SELECT * FROM USERS";
-            rs = stmt.executeQuery(sql);
+    
+    //insert spring jdbc template
+    public User insertar(User a) {
+ 
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(
+        DBConnection.getInstance().getDataSource()).withTableName("USERS").usingGeneratedKeyColumns("ID");
+        Map<String, Object> parameters = new HashMap<String, Object>();
 
-            //STEP 5: Extract data from result set
-            while (rs.next()) {
-                //Retrieve by column name
-                int id = rs.getInt("id");
-                String nombre = rs.getString("nombre");
-                String password = rs.getString("password");
-                Boolean activo = rs.getBoolean("activo");
-                String cod_activacion = rs.getString("cod_activacion");
-                Date fecha_activacion = rs.getDate("fecha_activacion");
-                String email = rs.getString("email");
-                nuevo = new User();
-                nuevo.setId(id);
-                nuevo.setNombre(nombre);
-                nuevo.setPassword(password);
-                nuevo.setActivo(activo);
-                nuevo.setCodActivacion(cod_activacion);
-                nuevo.setFechaActivacion((java.sql.Date) fecha_activacion);
-                nuevo.setEmail(email);
-                
-                lista.add(nuevo);
-            }
-
-        } catch (Exception ex) {
-            Logger.getLogger(UsersDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(UsersDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            DBConnection.getInstance().cerrarConexion(con);
-        }
-        return lista;
-
-    }
-
-    public List<User> getAllAlumnosJDBCTemplate() {
-     
-        JdbcTemplate jtm = new JdbcTemplate(
-          DBConnection.getInstance().getDataSource());
-        List<User> users = jtm.query("Select * from ALUMNOS",
-          new BeanPropertyRowMapper(User.class));
-        
-        
-        return users;
+        parameters.put("NOMBRE", a.getNombre());
+        parameters.put("PASSWORD", a.getPassword());
+        parameters.put("ACTIVO", a.getActivo());
+        parameters.put("CODIGO_ACTIVACION", a.getCodActivacion());
+        parameters.put("FECHA_ACTIVACION", a.getFechaActivacion());
+        parameters.put("EMAIL", a.getEmail());
+        a.setId(jdbcInsert.executeAndReturnKey(parameters).longValue());
+        return a;
     }
     
-    public User insertUserJDBC(User u) {
-        Connection con = null;
+    //update spring jdbc template
+    public int activado(String cod) {
+        int fila = 0;
         try {
-            con = DBConnection.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO USERS (NOMBRE,PASSWORD,ACTIVO,CODIGO_ACTIVACION,FECHA_ACTIVACION,EMAIL) VALUES(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-
-            stmt.setString(1, u.getNombre());
-            stmt.setString(2, u.getPassword());
-            stmt.setBoolean(3, u.getActivo());
-            stmt.setString(4, u.getCodActivacion());
-            stmt.setDate(5, u.getFechaActivacion());
-            stmt.setString(6, u.getEmail());
-
-            int filas = stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                u.setId(rs.getInt(1));
-            }
-
-        } catch (Exception ex) {
-            Logger.getLogger(AlumnosDAO.class.getName()).log(Level.SEVERE, null, ex);
-            u = null;
-        } finally {
-            DBConnection.getInstance().cerrarConexion(con);
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(
+            DBConnection.getInstance().getDataSource());
+            String sqlUpdate = "UPDATE USERS set ACTIVO = 1 where CODIGO_ACTIVACION = ?";
+            fila = jdbcTemplate.update(sqlUpdate, cod);
         }
-
-        return u;
+        catch (DataAccessException e) {
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            System.out.println("El error es: " + errors.toString());
+        }
+        return fila;
+    }
+    
+    //select spring jdbc template
+    public User seleccionar(String nombre) {
+        User usuario = null;
+        try {        
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(
+            DBConnection.getInstance().getDataSource());
+            String sqlSelect = "SELECT * FROM USERS WHERE NOMBRE= ?";
+            usuario = (User) jdbcTemplate.queryForObject(sqlSelect, new Object[]{nombre}, new BeanPropertyRowMapper(User.class));
+        }
+        catch (DataAccessException e) {
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            System.out.println("El error es: " + errors.toString());
+        }
+        return usuario;
     }
 }

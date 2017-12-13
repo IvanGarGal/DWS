@@ -1,9 +1,3 @@
-<%-- 
-    Document   : pintarListaNotas
-    Created on : 10-nov-2017, 11:53:58
-    Author     : Miguel Angel Diaz
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" 
            uri="http://java.sun.com/jsp/jstl/core" %>

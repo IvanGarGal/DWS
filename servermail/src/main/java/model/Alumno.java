@@ -7,10 +7,7 @@ package model;
 
 import java.util.Date;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
+
 public class Alumno {
     
     private long id;

@@ -16,11 +16,8 @@ import servicios.AlumnosServicios;
 import servicios.AsignaturasServicios;
 import servicios.NotasServicios;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
-@WebServlet(name = "Notas", urlPatterns = {"/notas"})
+
+@WebServlet(name = "Notas", urlPatterns = {"secure/notas"})
 public class Notas extends HttpServlet {
 
     /**

@@ -5,10 +5,7 @@
  */
 package model;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
+
 public class Nota {
     
     private Long idAlumno;

@@ -119,7 +119,7 @@ public class FiltroLogin implements Filter {
 
                 chain.doFilter(request, response);
             } else {
-                request.getRequestDispatcher("/login.html").forward(request, response);
+                request.getRequestDispatcher("/usuario.jsp").forward(request, response);
             }
         } catch (Throwable t) {
             // If an exception is thrown somewhere down the filter chain,

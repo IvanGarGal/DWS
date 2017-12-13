@@ -1,6 +1,7 @@
 package model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public class User {
     
@@ -70,5 +71,7 @@ public class User {
     
     public User() {
     }
-    
+
+
+
 }

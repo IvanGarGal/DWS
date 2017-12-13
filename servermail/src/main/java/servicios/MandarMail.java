@@ -5,10 +5,84 @@
  */
 package servicios;
 
+import config.Configuration;
+
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
+
 /**
  *
- * @author rafa
+ * @author oscar
  */
 public class MandarMail {
+
     
+    public void mandarMail(String to, String cod) {
+        try {
+            Email email = new SimpleEmail();
+            String mensaje = "http://localhost:3306/servermail/usuario?action=activar&cod_act="+cod;
+            email.setHostName(Configuration.getInstance().getSmtpServer());
+            email.setSmtpPort(Integer.parseInt(Configuration.getInstance().getSmtpPort()));
+            email.setAuthentication(Configuration.getInstance().getMailFrom(), Configuration.getInstance().getMailPass());
+            //email.setSSLOnConnect(true);
+            email.setStartTLSEnabled(true);
+            email.setFrom("alumno1@iesquevedo.es");
+            email.setSubject("ACTIVAR CUENTA");
+            email.setMsg(mensaje);
+            email.addTo(to);
+
+            email.send();
+        } catch (EmailException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(MandarMail.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    public void generateAndSendEmail(String to, String msg,String subject) throws AddressException, MessagingException {
+        Properties mailServerProperties;
+        Session getMailSession;
+        MimeMessage generateMailMessage;
+
+        // Step1
+       
+        mailServerProperties = System.getProperties();
+        mailServerProperties.put("mail.smtp.port", Integer.parseInt(Configuration.getInstance().getSmtpPort()));
+        mailServerProperties.put("mail.smtp.auth", "true");
+        mailServerProperties.put("mail.smtp.starttls.enable", "true");
+        System.out.println("Mail Server Properties have been setup successfully..");
+
+        // Step2
+       
+        getMailSession = Session.getDefaultInstance(mailServerProperties, null);
+        generateMailMessage = new MimeMessage(getMailSession);
+        generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        generateMailMessage.setSubject(subject);
+        String emailBody = msg;
+        generateMailMessage.setContent(emailBody, "text/html");
+        
+
+        // Step3
+  
+        Transport transport = getMailSession.getTransport("smtp");
+
+        // Enter your correct gmail UserID and Password
+        // if you have 2FA enabled then provide App Specific Password
+        transport.connect(Configuration.getInstance().getSmtpServer(), 
+                Configuration.getInstance().getMailFrom(),
+                Configuration.getInstance().getMailPass());
+        transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
+        transport.close();
+    }
 }

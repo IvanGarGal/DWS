@@ -5,10 +5,7 @@
  */
 package model;
 
-/**
- *
- * @author Miguel Angel Diaz
- */
+
 public class Asignatura {
     
     private Long id;
