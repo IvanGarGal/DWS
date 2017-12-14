@@ -1,0 +1,13 @@
+{
+    "name": "vendor/practica-b-d-p-h-p",
+    "description": "Description of project PracticaBDPHP.",
+    "authors": [
+        {
+            "name": "DAW",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "joshcam/mysqli-database-class": "v2.8"
+    }
+}
